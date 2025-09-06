@@ -1,0 +1,95 @@
+<div class="flex flex-col lg:flex-row h-screen bg-gray-100">
+   <div class="w-full lg:w-3/5 bg-red-500 flex items-center justify-center p-6 lg:p-0">
+    <div class="text-white text-center px-6 lg:px-12">
+      <h1 class="text-4xl lg:text-5xl font-extrabold mb-6 drop-shadow-lg">
+        ¡Bienvenido a
+        <div class="animate__animated animate__bounceIn animate__slower">
+          <span class="text-yellow-300">Maxco</span>!
+        </div>
+      </h1>
+      <p class="text-lg lg:text-xl font-light leading-relaxed">
+        Empresa líder en la Representación Global de la Marca MAXFIT Autoparts y Genuino, con presencia y reconocidos por la calidad de su gestión y su equipo humano.
+      </p>
+    </div>
+  </div>
+
+  <div class="w-full lg:w-2/5 flex items-center justify-center p-6 lg:p-0 bg-white shadow-xl">
+    <div class="w-full max-w-md px-8 py-12">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Iniciar Sesión</h2>
+        <p class="text-gray-600">Ingresa tus credenciales para acceder</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Usuario <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user text-gray-400"></i>
+            </div>
+            <input 
+              formControlName="user_name" 
+              type="text" 
+              placeholder="Ingresa tu usuario"
+              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              [class.border-red-500]="loginForm.get('user_name')?.invalid && loginForm.get('user_name')?.touched"
+            >
+          </div>
+          <div *ngIf="loginForm.get('user_name')?.invalid && loginForm.get('user_name')?.touched" class="text-red-500 text-sm mt-1">
+            <div *ngIf="loginForm.get('user_name')?.errors?.['required']">El usuario es obligatorio</div>
+            <div *ngIf="loginForm.get('user_name')?.errors?.['minlength']">Mínimo 3 caracteres</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-sm font-medium text-gray-700">
+              Contraseña <span class="text-red-500">*</span>
+            </label> 
+          </div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input 
+              formControlName="password" 
+              [type]="showPassword ? 'text' : 'password'" 
+              placeholder="Ingresa tu contraseña"
+              class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            >
+            <button 
+              type="button" 
+              (click)="togglePasswordVisibility()" 
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-red-500 text-sm mt-1">
+            <div *ngIf="loginForm.get('password')?.errors?.['required']">La contraseña es obligatoria</div>
+            <div *ngIf="loginForm.get('password')?.errors?.['minlength']">Mínimo 3 caracteres</div>
+          </div>
+        </div>
+ 
+
+        <div>
+          <button 
+            type="submit" 
+            [disabled]="isLoading || loginForm.invalid"
+            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+            [class.opacity-70]="isLoading || loginForm.invalid"
+            [class.cursor-not-allowed]="isLoading || loginForm.invalid"
+          >
+            <span *ngIf="isLoading" class="mr-2">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
+            <span>{{ isLoading ? 'Ingresando...' : 'Ingresar' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

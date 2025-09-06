@@ -1,0 +1,217 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Gestión de Productos</h1>
+    <button (click)="nuevoProducto()" 
+    class="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg shadow-md transition-colors duration-300">
+    <i class="fas fa-plus mr-2"></i>Nuevo Producto
+  </button>
+  </div>
+
+  <!-- Search -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+    <div class="relative">
+      <input 
+        type="text" 
+        [(ngModel)]="searchText" 
+        placeholder="Buscar productos..."
+        class="w-full px-4 py-3 pl-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+      >
+      <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+    </div>
+  </div>
+
+  <!-- Product Form -->
+  <div  *ngIf="isCreating || isEditing" class="bg-gray-800 dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white">
+      {{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}
+    </h2>
+    
+    <form [formGroup]="productoForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Nombre -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Nombre <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            formControlName="nombre"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            [class.border-red-500]="formControls['nombre'].invalid && formControls['nombre'].touched"
+          >
+          <div *ngIf="formControls['nombre'].invalid && formControls['nombre'].touched" class="text-red-500 text-sm">
+            <span *ngIf="formControls['nombre'].errors?.['required']">El nombre es requerido</span>
+            <span *ngIf="formControls['nombre'].errors?.['minlength']">Mínimo 3 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Categoría -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Categoría <span class="text-red-500">*</span>
+          </label>
+          <select 
+            formControlName="categoria"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            [class.border-red-500]="formControls['categoria'].invalid && formControls['categoria'].touched"
+          >
+            <option value="">Seleccione una categoría</option>
+            <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+          </select>
+          <div *ngIf="formControls['categoria'].invalid && formControls['categoria'].touched" class="text-red-500 text-sm">
+            La categoría es requerida
+          </div>
+        </div>
+
+        <!-- Precio -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Precio <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+            <input 
+              type="number" 
+              formControlName="precio"
+              step="0.01"
+              min="0.01"
+              class="w-full pl-8 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              [class.border-red-500]="formControls['precio'].invalid && formControls['precio'].touched"
+            >
+          </div>
+          <div *ngIf="formControls['precio'].invalid && formControls['precio'].touched" class="text-red-500 text-sm">
+            <span *ngIf="formControls['precio'].errors?.['required']">El precio es requerido</span>
+            <span *ngIf="formControls['precio'].errors?.['min']">El precio debe ser mayor a 0</span>
+          </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Stock <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="number" 
+            formControlName="stock"
+            min="0"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            [class.border-red-500]="formControls['stock'].invalid && formControls['stock'].touched"
+          >
+          <div *ngIf="formControls['stock'].invalid && formControls['stock'].touched" class="text-red-500 text-sm">
+            <span *ngIf="formControls['stock'].errors?.['required']">El stock es requerido</span>
+            <span *ngIf="formControls['stock'].errors?.['min']">El stock no puede ser negativo</span>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="space-y-2 md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Descripción <span class="text-red-500">*</span>
+          </label>
+          <textarea 
+            formControlName="descripcion"
+            rows="3"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            [class.border-red-500]="formControls['descripcion'].invalid && formControls['descripcion'].touched"
+          ></textarea>
+          <div *ngIf="formControls['descripcion'].invalid && formControls['descripcion'].touched" class="text-red-500 text-sm">
+            La descripción es requerida
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex justify-end space-x-4 pt-6 mt-6 border-t border-gray-200 dark:border-gray-700">
+        <button 
+          type="button" 
+          (click)="resetForm()" 
+          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          [disabled]="productoForm.invalid"
+          class="px-6 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 disabled:opacity-50"
+        >
+          {{ isEditing ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Products Table -->
+  <div class="bg-gray-800 dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nombre</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categoría</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-gray-800 dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <!-- Loading State -->
+          <tr *ngIf="isLoading">
+            <td colspan="5" class="px-6 py-4 text-center">
+              <div class="flex justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Empty State -->
+          <tr *ngIf="!isLoading && filteredProductos.length === 0">
+            <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+              No se encontraron productos
+            </td>
+          </tr>
+          
+          <!-- Products List -->
+          <tr *ngFor="let producto of filteredProductos" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{{ producto.descripcion }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                {{ producto.categoria }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <span class="text-gray-900 dark:text-white">${{ producto.precio | number:'1.2-2' }}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <span [ngClass]="{
+                'text-green-600 dark:text-green-400': producto.stock > 10,
+                'text-yellow-600 dark:text-yellow-400': producto.stock > 0 && producto.stock <= 10,
+                'text-red-600 dark:text-red-400': producto.stock === 0
+              }">
+                {{ producto.stock }} unidades
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button 
+                (click)="editProducto(producto)" 
+                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+                title="Editar"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+              <button 
+                (click)="deleteProducto(producto.id_producto!)" 
+                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                title="Eliminar"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

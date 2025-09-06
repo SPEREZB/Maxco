@@ -1,0 +1,84 @@
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Zonas</h2>
+  
+    <!-- Formulario -->
+    <form (ngSubmit)="editando ? actualizarZona() : agregarZona()" class="mb-4">
+      <div class="mb-3">
+        <label class="form-label">Nombre de la zona</label>
+        <input type="text" class="form-control" [(ngModel)]="nuevaZona.nombre_zona" name="nombre_zona" required />
+      </div>
+  
+      <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-control" [(ngModel)]="nuevaZona.descripcion" name="descripcion"></textarea>
+      </div>
+  
+      <button type="submit" class="btn btn-primary me-2">
+        {{ editando ? 'Actualizar' : 'Agregar' }}
+      </button>
+      <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelarEdicion()">
+        Cancelar
+      </button>
+    </form>
+  
+    <!-- Reportes de zonas -->
+    <div class="mb-4 flex flex-wrap gap-2">
+      <button class="btn btn-outline-primary" (click)="cargarZonasMasVentasPorVendedor()">Zonas con más ventas por vendedor</button>
+      <div class="d-flex align-items-center gap-2">
+        <input type="date" [(ngModel)]="fechaInicio" class="form-control form-control-sm" style="max-width: 150px;" placeholder="Desde">
+        <input type="date" [(ngModel)]="fechaFin" class="form-control form-control-sm" style="max-width: 150px;" placeholder="Hasta">
+        <button class="btn btn-outline-secondary btn-sm" (click)="cargarZonasSinVentas()">Zonas sin ventas (por fechas)</button>
+      </div>
+    </div>
+
+    <div *ngIf="zonasMasVentasPorVendedor.length" class="mb-4">
+      <h5>Zonas con más ventas por vendedor</h5>
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th>Vendedor</th><th>Zona</th><th>Total Ventas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of zonasMasVentasPorVendedor">
+            <td>{{ r.nombre_vendedor }}</td>
+            <td>{{ r.zona }}</td>
+            <td>{{ r.total_ventas }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="zonasSinVentas.length" class="mb-4">
+      <h5>Zonas sin ventas (en el rango)</h5>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let z of zonasSinVentas">
+          {{ z.nombre }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tabla -->
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre zona</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let zona of zonas">
+          <td>{{ zona.id_zona }}</td>
+          <td>{{ zona.nombre_zona }}</td>
+          <td>{{ zona.descripcion }}</td>
+          <td>
+            <button class="btn btn-warning btn-sm me-2" (click)="editarZona(zona)">Editar</button>
+            <button class="btn btn-danger btn-sm" (click)="eliminarZona(zona.id_zona!)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

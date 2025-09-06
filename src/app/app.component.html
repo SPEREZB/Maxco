@@ -1,0 +1,22 @@
+<!-- app.component.html -->
+<!-- ============================================================== -->
+<!-- Main wrapper - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<!-- Login Component -->
+<div
+  [ngClass]="{'animate__animated animate__slideInLeft': !isLogin}"
+  *ngIf="!hideLogin"
+  class="absolute inset-0 z-10"
+>
+  <app-login (log)="onLogin()"></app-login>
+</div>
+
+
+<!-- Main Menu Component -->
+<div 
+  [ngClass]="{'animate__animated animate__slideInRight': isMenu}" 
+  *ngIf="isLogin" 
+  class="absolute inset-0 z-20"
+>
+<app-mainmenu (logout)="onLogout()"></app-mainmenu> 
+</div>

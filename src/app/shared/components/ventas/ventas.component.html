@@ -1,0 +1,167 @@
+<div class="container mt-4">
+    <h2 class="mb-3">Gestión de Ventas</h2>
+  
+    <!-- Formulario -->
+    <form (ngSubmit)="editando ? actualizarVenta() : agregarVenta()" class="mb-4">
+      <div class="mb-3">
+        <label class="form-label">Fecha</label>
+        <input type="date" class="form-control" [(ngModel)]="nuevaVenta.fecha" name="fecha" required />
+      </div>
+  
+      <div class="mb-3">
+        <label class="form-label">Monto total</label>
+        <input type="number" class="form-control" [(ngModel)]="nuevaVenta.monto_total" name="monto_total" required />
+      </div>
+  
+      <div class="mb-3">
+        <label class="form-label">Cliente</label>
+        <select class="form-select" [(ngModel)]="nuevaVenta.id_cliente" name="id_cliente" required>
+          <option [value]="0" disabled>Seleccione un cliente</option>
+          <ng-container *ngFor="let u of usuarios">
+            <option *ngIf="u.rol === 'CLT'" [value]="u.id_usuario">
+              {{ u.nombre }}
+            </option>
+          </ng-container>
+        </select>
+      </div>
+  
+      <div class="mb-3">
+        <label class="form-label">Zona</label>
+        <select class="form-select" [(ngModel)]="nuevaVenta.id_zona" name="id_zona" required>
+          <option [value]="0" disabled>Seleccione una zona</option>
+          <option *ngFor="let z of zonas" [value]="z.id_zona">{{ z.nombre_zona }}</option>
+        </select>
+      </div>
+  
+      <button type="submit" class="btn btn-primary me-2">
+        {{ editando ? 'Actualizar' : 'Agregar' }}
+      </button>
+      <button *ngIf="editando" type="button" class="btn btn-secondary" (click)="cancelarEdicion()">
+        Cancelar
+      </button>
+    </form>
+  
+    <!-- Botones de reportes especiales -->
+    <div class="mb-4 flex flex-wrap gap-2">
+      <button class="btn btn-outline-primary" (click)="cargarVentasPorCliente()">Ventas por Cliente</button>
+      <div class="d-flex align-items-center gap-2">
+        <input type="date" [(ngModel)]="fechaInicio" class="form-control form-control-sm" style="max-width: 150px;" placeholder="Desde">
+        <input type="date" [(ngModel)]="fechaFin" class="form-control form-control-sm" style="max-width: 150px;" placeholder="Hasta">
+        <button class="btn btn-outline-secondary btn-sm" (click)="cargarVendedoresSinVentas()">Vendedores sin Ventas</button>
+      </div>
+    </div>
+
+    <!-- Resultados de reportes -->
+    
+
+    <div *ngIf="reporteVentasPorCliente.length" class="mb-4">
+      <h5>Ventas por Cliente</h5>
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th>Cliente</th><th>Zona</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of reporteVentasPorCliente">
+            <td>{{ r.nombre_cliente }}</td>
+            <td>{{ r.zona }}</td>
+            <td>{{ r.ventas_2020 }}</td>
+            <td>{{ r.ventas_2021 }}</td>
+            <td>{{ r.ventas_2022 }}</td>
+            <td>{{ r.ventas_2023 }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="reporteZonasSinVentas.length" class="mb-4">
+      <h5>Zonas sin Ventas (entre fechas)</h5>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let z of reporteZonasSinVentas">
+          {{ z.nombre_zona }}
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="reporteVendedoresSinVentas.length" class="mb-4">
+      <h5>Vendedores sin Ventas (entre fechas)</h5>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let v of reporteVendedoresSinVentas">
+          {{ v.nombre_vendedor }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tabla -->
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID Venta</th>
+          <th>Fecha</th>
+          <th>Monto Total</th>
+          <th>Cliente</th>
+          <th>Zona</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let venta of ventas">
+          <td>{{ venta.id_venta }}</td>
+          <td>{{ venta.fecha }}</td>
+          <td>{{ venta.monto_total }}</td>
+          <td>{{ getUsuarioNombre(venta.id_cliente) }}</td>
+          <td>{{ getZonaNombre(venta.id_zona) }}</td>
+          <td>
+            <button class="btn btn-info btn-sm me-2" (click)="verDetalleVenta(venta.id_venta)">
+              Detalle
+            </button>
+            <button class="btn btn-warning btn-sm me-2" (click)="editarVenta(venta)">Editar</button>
+            <button class="btn btn-danger btn-sm" (click)="eliminarVenta(venta.id_venta!)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div> 
+<!-- Modal de detalle de venta -->
+<div *ngIf="mostrarModalDetalle" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-3/4 max-w-xl">
+    <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Detalle de la venta</h3>
+
+    <table class="table-auto w-full mb-4 border-collapse border border-gray-300">
+      <thead>
+        <tr class="bg-gray-200 dark:bg-gray-700">
+          <th class="border px-2 py-1">Producto</th>
+          <th class="border px-2 py-1">Cantidad</th>
+          <th class="border px-2 py-1">Precio</th> 
+          <th class="border px-2 py-1">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of detalleVenta">
+          <td class="border px-2 py-1">{{ getNombreProducto(d.id_producto) }}</td>
+
+          <!-- Editable cantidad -->
+          <td class="border px-2 py-1">
+            <input type="number" [(ngModel)]="d.cantidad" class="form-control form-control-sm" />
+          </td>
+
+          <!-- Editable precio -->
+          <td class="border px-2 py-1">
+            <input type="text" [(ngModel)]="d.precio" class="form-control form-control-sm" />
+          </td>
+ 
+          <!-- Acciones -->
+          <td class="border px-2 py-1 flex gap-2">
+            <button (click)="guardarDetalle(d)" class="btn btn-success btn-sm">Guardar</button>
+            <button (click)="eliminarDetalle(d.id_detalle_venta)" class="btn btn-danger btn-sm">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="flex justify-end">
+      <button (click)="cerrarDetalle()" class="px-4 py-2 bg-red-600 text-white rounded-lg">Cerrar</button>
+    </div>
+  </div>
+</div>
