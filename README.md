@@ -2,13 +2,32 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.4.
 
+## Aclaraciones
+
+Para esta prueba hice uso de una sola tabla para los vendedores y clientes, de esta manera se puede evitar hacer una tabla extra innecesariamente. Es decir en lugar de tener una tabla para clientes y otra para vendedores se usa una misma tabla y se los diferencia con un campo llamado "rol" que puede ser "cliente" o "vendedor". 
+Se agrego un pequeño login que permite a los usuarios acceder a la aplicacion. Se adjunta como quedo la DB con las modificaciones propuestas.
+
+
+
 ## Screenshots
 
+
 ![Pantalla de login](src/assets/images/CAP1.png)
+
+
 ![Usuarios](src/assets/images/CAP2.png)
+
+
 ![Zonas](src/assets/images/CAP3.png)
+
+
 ![Productos](src/assets/images/CAP4.png)
+
+
 ![Ventas](src/assets/images/CAP5.png)
+
+![DB](src/assets/images/capdb.png)
+
 
 ## Development server
 
