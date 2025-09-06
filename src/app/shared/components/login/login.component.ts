@@ -52,9 +52,8 @@ export class LoginComponent {
         this.isLoading = false;
      
         const loginData = this.loginForm.value;
-        const usuarioEstatico = loginData.username === 'sebas' && loginData.password === '123';
-    
-        if (response || usuarioEstatico) {
+       
+        if (response) {
           const userId = response ? response.user.id_user : 0; 
           const rol = response ? response.user.rol : 'ADMIN'; 
           const token = response ? response.access_token : 'token-falso';
